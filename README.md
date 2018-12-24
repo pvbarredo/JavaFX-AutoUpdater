@@ -14,7 +14,7 @@
 > Java FX application that will auto update Java Application . No need to use FXlauncher
 
 
-[![Build Status](http://img.shields.io/travis/badges/badgerbadgerbadger.svg?style=flat-square)](https://travis-ci.org/badges/badgerbadgerbadger) 
+[![Build Status](https://travis-ci.org/pvbarredo/JavaFX-AutoUpdater.svg?branch=master)](https://travis-ci.org/pvbarredo/JavaFX-AutoUpdater) [![Test Coverage](https://codecov.io/gh/pvbarredo/JavaFX-AutoUpdater/branch/master/graph/badge.svg)](https://codecov.io/gh/pvbarredo/JavaFX-AutoUpdater) 
 
 
 ***INSERT ANOTHER GRAPHIC HERE***
