@@ -35,6 +35,7 @@ public class ZipService extends Service<Boolean> {
                 }
                 System.out.println("Finish Extracting");
                 updateMessage("Finish Extracting");
+                updateProgress(100,100);
                 bos.close();
             }
 
@@ -68,13 +69,16 @@ public class ZipService extends Service<Boolean> {
                         entry = zipInput.getNextEntry();
                     }
                     zipInput.close();
+                    return true;
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
+                    return false;
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return false;
                 }
 
-                return false;
+
             }
         };
     }
