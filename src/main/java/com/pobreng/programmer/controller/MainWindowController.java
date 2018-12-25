@@ -18,12 +18,27 @@ public class MainWindowController {
     Label progressLabel;
 
 
-    public void startProcess() {
+    public void initialize() {
 
 
         //downloading
-        new DownloadService(progressBar, progressLabel);
-        new ZipService(progressBar, progressLabel);
+
+//        this.progressBar.setProgress(0);
+//        this.progressLabel.setText("Checking internet connection ...");
+//        if(hasInternet()){
+//            this.progressBar.setProgress(1);
+//            this.progressLabel.setText("Internet connection available ...");
+//        }else{
+//            this.progressLabel.setText("No internet connection!");
+//        }
+
+        DownloadService downloadService = new DownloadService();
+        progressBar.progressProperty().bind(downloadService.progressProperty());
+
+        progressLabel.textProperty().bind(downloadService.messageProperty());
+
+        downloadService.start();
+//        new ZipService(progressBar, progressLabel);
 
     }
 

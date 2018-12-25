@@ -16,26 +16,16 @@ import java.net.URLConnection;
 public class DownloadService extends Service<Boolean> {
 
     private Config config;
-    private ProgressBar progressBar;
-    private Label progressLabel;
+
 
 //manipulate the URL first
     //download
 
-    public DownloadService(ProgressBar progressBar , Label progressLabel) {
-        this.progressBar = progressBar;
-        this.progressBar.setProgress(0);
-        this.progressLabel = progressLabel;
+    public DownloadService() {
 
-        this.progressLabel.setText("Checking internet connection ...");
-        if(hasInternet()){
-            this.progressBar.setProgress(1);
-            this.progressLabel.setText("Internet connection available ...");
-        }else{
-            this.progressLabel.setText("No internet connection!");
-        }
 
-        download();
+
+
     }
 
     public void download(){
@@ -52,7 +42,7 @@ public class DownloadService extends Service<Boolean> {
             long totalFileSize = getFileSize(url);
 
             System.out.println("Downloading total file size : " + totalFileSize);
-            progressLabel.setText("Downloading total file size : " + totalFileSize);
+
 
             BufferedInputStream inputStream = new BufferedInputStream(url.openStream());
 
@@ -66,11 +56,10 @@ public class DownloadService extends Service<Boolean> {
                 outputStream.write(dataBuffer,0,bytesRead);
                 totalDownloadedSize += bytesRead;
                 System.out.println( "Download percentage : " + computePercentage(totalFileSize, totalDownloadedSize) + "%") ;
-                progressLabel.setText("Downloading total file size : " + totalFileSize + "[" +computePercentage(totalFileSize, totalDownloadedSize) +"%]" );
-                progressBar.setProgress(computePercentage(totalFileSize, totalDownloadedSize));
+
 
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -138,8 +127,58 @@ public class DownloadService extends Service<Boolean> {
 
             @Override
             protected Boolean call() throws Exception {
+                try {
+                updateMessage("Checking internet connection");
+                updateProgress(0,100);
+                System.out.println("Checking internet connection ...");
+                if(hasInternet()){
+                    System.out.println("Internet connection available ...");
+                    updateProgress(100,100);
+                    updateMessage("Internet connection available ...");
+                }else{
 
-                return false;
+                    System.out.println("No internet connection available ...");
+                    updateMessage("No Internet connection available ...");
+                }
+
+
+                //---Download
+
+
+                    URL url = new URL(generateURL());
+                    long totalFileSize = getFileSize(url);
+
+                    System.out.println("Downloading total file size : " + totalFileSize);
+                    updateMessage("Downloading total file size : " + totalFileSize);
+                    updateProgress(0,100);
+                    BufferedInputStream inputStream = new BufferedInputStream(url.openStream());
+
+                    FileOutputStream outputStream = new FileOutputStream("hkctr_v1.1.jar");
+
+                    byte dataBuffer[] = new byte[1024];
+
+                    int bytesRead;
+                    long totalDownloadedSize = 0;
+                    while((bytesRead = inputStream.read(dataBuffer,0,1024)) != -1 ){
+                        outputStream.write(dataBuffer,0,bytesRead);
+                        totalDownloadedSize += bytesRead;
+                        System.out.println( "Download percentage : " + computePercentage(totalFileSize, totalDownloadedSize) + "%") ;
+                        updateMessage("Download percentage : " + computePercentage(totalFileSize, totalDownloadedSize) + "%");
+                        updateProgress( computePercentage(totalFileSize, totalDownloadedSize),100);
+
+                    }
+
+
+//---Download
+
+                updateMessage("Finish downloading ...");
+                updateProgress(100,100);
+                return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+
             }
         };
     }
