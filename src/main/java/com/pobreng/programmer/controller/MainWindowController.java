@@ -6,8 +6,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 
-import java.net.URL;
-import java.net.URLConnection;
 
 public class MainWindowController {
 
@@ -20,35 +18,21 @@ public class MainWindowController {
 
     public void initialize() {
 
-
-        //downloading
-
-//        this.progressBar.setProgress(0);
-//        this.progressLabel.setText("Checking internet connection ...");
-//        if(hasInternet()){
-//            this.progressBar.setProgress(1);
-//            this.progressLabel.setText("Internet connection available ...");
-//        }else{
-//            this.progressLabel.setText("No internet connection!");
-//        }
-
         DownloadService downloadService = new DownloadService();
         progressBar.progressProperty().bind(downloadService.progressProperty());
-
         progressLabel.textProperty().bind(downloadService.messageProperty());
-
         downloadService.start();
-//        new ZipService(progressBar, progressLabel);
+
+        downloadService.setOnSucceeded(succeed ->{
+            System.out.println("SUCCEEDED!");
+            ZipService zipService = new ZipService();
+            progressBar.progressProperty().bind(zipService.progressProperty());
+            progressLabel.textProperty().bind(zipService.messageProperty());
+            zipService.start();
+        });
 
     }
 
-    public void setProgressBarLabel(String message){
-        progressLabel.setText(message);
-
-    }
-    public void setProgressBar(double percentage){
-        progressBar.setProgress(percentage);
-    }
 
 
 

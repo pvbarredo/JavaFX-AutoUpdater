@@ -1,83 +1,86 @@
 package com.pobreng.programmer.service;
 
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
+
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 
 import java.io.*;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+
 import java.util.zip.ZipInputStream;
 
-public class ZipService {
-    private long totalZipSize ;
-    private ProgressBar progressBar;
-    private Label progressLabel;
+public class ZipService extends Service<Boolean> {
 
-    public ZipService(ProgressBar progressBar , Label progressLabel ) {
 
-        this.progressBar = progressBar;
-        this.progressBar.setProgress(0);
-        this.progressLabel = progressLabel;
-        unzip();
-    }
+    @Override
+    protected Task<Boolean> createTask() {
 
-    private void unzip(){
-        try {
-            String zipFilePath = "test/hkctr_v1.1.zip";
+        return new Task<Boolean>() {
+            private long totalZipSize;
 
-            ZipInputStream zipInput = new ZipInputStream(new FileInputStream(zipFilePath));
-            ZipEntry entry = zipInput.getNextEntry();
-            totalZipSize = entry.getCompressedSize();
+            private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+                FileOutputStream fos = new FileOutputStream(filePath);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
 
-            System.out.println("Extracting downloaded ZIP file - " + totalZipSize);
-            progressLabel.setText("Extracting downloaded ZIP file - " + totalZipSize);
+                byte[] bytesIn = new byte[4096];
+                int read = 0;
+                long totalExtractedSize = 0;
+                System.out.println("Extracting downloaded file");
+                updateMessage("Extracting downloaded file");
 
-            while (entry != null) {
-                String filePath = "test/"+ entry.getName();
+                while ((read = zipIn.read(bytesIn)) != -1) {
+                    bos.write(bytesIn, 0, read);
+                    totalExtractedSize += read;
 
-                if (!entry.isDirectory()) {
-
-                    extractFile(zipInput, filePath);
-                } else {
-
-                    File dir = new File(filePath);
-                    dir.mkdir();
                 }
-                zipInput.closeEntry();
-                entry = zipInput.getNextEntry();
+                System.out.println("Finish Extracting");
+                updateMessage("Finish Extracting");
+                bos.close();
             }
-            zipInput.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+            @Override
+            protected Boolean call() throws Exception {
+
+
+                //extract
+                try {
+                    String zipFilePath = "test/hkctr_v1.1.zip";
+
+                    ZipInputStream zipInput = new ZipInputStream(new FileInputStream(zipFilePath));
+                    ZipEntry entry = zipInput.getNextEntry();
+                    totalZipSize = entry.getCompressedSize();
+
+                    System.out.println("Extracting downloaded ZIP file - " + totalZipSize);
+                    updateMessage("Extracting downloaded ZIP file - " + totalZipSize);
+
+                    while (entry != null) {
+                        String filePath = "test/" + entry.getName();
+
+                        if (!entry.isDirectory()) {
+
+                            extractFile(zipInput, filePath);
+                        } else {
+
+                            File dir = new File(filePath);
+                            dir.mkdir();
+                        }
+                        zipInput.closeEntry();
+                        entry = zipInput.getNextEntry();
+                    }
+                    zipInput.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return false;
+            }
+        };
     }
 
-    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-        FileOutputStream fos = new FileOutputStream(filePath);
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
 
-        byte[] bytesIn = new byte[4096];
-        int read = 0;
-        long totalExtractedSize = 0;
-        System.out.println( "Extracting downloaded file");
-        progressLabel.setText( "Extracting downloaded file");
-        while ((read = zipIn.read(bytesIn)) != -1) {
-            bos.write(bytesIn, 0, read);
-            totalExtractedSize += read;
-
-        }
-        System.out.println( "Finish Extracting");
-        progressLabel.setText( "Finish Extracting");
-        this.progressBar.setProgress(1);
-        bos.close();
-    }
-    private void clean(){
-
-    }
-
-    private void copy(){
-
-    }
 }
+
+
+
