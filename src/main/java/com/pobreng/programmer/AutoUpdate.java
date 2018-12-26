@@ -58,13 +58,14 @@ public class AutoUpdate {
 
                 ButtonType updateButton = new ButtonType("Update");
 
-                alert.getButtonTypes().removeAll();
+                alert.getButtonTypes().clear();
                 alert.getButtonTypes().add(updateButton);
 
                 Optional<ButtonType> option = alert.showAndWait();
 
-                if (option.get() == updateButton) {
 
+               if (option.isPresent() && option.get() == updateButton) {
+                    //TODO: put a thread stop if the application died
                     start();
 
                 }
